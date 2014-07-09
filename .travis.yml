@@ -1,0 +1,48 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+install:
+  - sudo sh -c 'echo "deb http://www.icub.org/ubuntu precise contrib/science" > /etc/apt/sources.list.d/icub.list'
+  - sudo add-apt-repository -y ppa:kalakris/cmake
+  - sudo apt-get update
+  - sudo apt-get --force-yes install yarp
+  - sudo apt-get install cmake
+
+before_script:
+  - cmake --version
+  - cd ..
+  # Build and install YCM
+  - git clone https://github.com/robotology/ycm.git
+  - cd ycm
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+  - cd ../..
+  # Build and install paramHelp
+  - git clone https://github.com/robotology-playground/paramhelp.git
+  - cd paramhelp
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+  - cd ../..
+  # Prepare codyco-motor-friction-identification-lib build
+  - cd codyco-motor-friction-identification-lib
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make
+  - sudo make install
+  - sudo make uninstall
+
+notifications:
+  email:
+    - pegua1@gmail.com
