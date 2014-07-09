@@ -20,6 +20,7 @@ ycm_default_dirs(${VARS_PREFIX})
 
 find_package(YARP REQUIRED)
 find_package(paramHelp REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 SET(folder_source src/motorFrictionExcitationParams.cpp )
 
