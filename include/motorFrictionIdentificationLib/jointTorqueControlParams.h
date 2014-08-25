@@ -53,8 +53,9 @@ namespace jointTorqueControl
     static const VectorNd	DEFAULT_KCN				= VectorNd::Constant(0.0);
     static const VectorNd	DEFAULT_ZEROS_NDOF  	= VectorNd::Constant(0.0);
     
-    static const VectorNd	DEFAULT_KI				    = VectorNd::Constant(0.0);
     static const VectorNd	DEFAULT_KP				    = VectorNd::Constant(0.0);
+    static const VectorNd   DEFAULT_KI                  = VectorNd::Constant(0.0);
+    static const VectorNd   DEFAULT_KD                  = VectorNd::Constant(0.0);
     static const VectorNd	DEFAULT_COULOMB_VEL_THR	    = VectorNd::Constant(5.0);
     
     static const VectorNd	DEFAULT_TAUD			= VectorNd::Constant(0.0);
@@ -85,9 +86,9 @@ namespace jointTorqueControl
         /* RPC PARAMETERS */
         PARAM_ID_AJ,	        PARAM_ID_KT,	            PARAM_ID_KVP,
         PARAM_ID_KVN,	        PARAM_ID_KCP,	            PARAM_ID_KCN,
-        PARAM_ID_KI,	        PARAM_ID_KP,	            PARAM_ID_COULOMB_VEL_THR,
+        PARAM_ID_KP,	        PARAM_ID_KI,                PARAM_ID_KD,	            PARAM_ID_COULOMB_VEL_THR,
         PARAM_ID_VMAX,	        PARAM_ID_SENDCMD,           PARAM_ID_MONITORED_JOINT,
-        PARAM_ID_KS,            PARAM_ID_KD,                PARAM_ID_GRAV_COMP_ON,
+        PARAM_ID_KSTIFF,        PARAM_ID_KDAMP,                PARAM_ID_GRAV_COMP_ON,
         PARAM_ID_Q_DES,         PARAM_ID_FRICTION_COMPENSATION,
         PARAM_ID_TORQUE_FILT_CUT_FREQ,
         /* STREAMING INPUT PARAMETERS */
@@ -124,14 +125,15 @@ namespace jointTorqueControl
         new ParamProxyBasic<double>("kvn",          	    PARAM_ID_KVN,                   N_DOF,		ParamBilatBounds<double>(0.0, KVN_MAX),		    PARAM_IN_OUT,       DEFAULT_KVN.data(),				"Vector of nDOF floats ( see Eq. (2) )"),
         new ParamProxyBasic<double>("kcp",		            PARAM_ID_KCP,                   N_DOF,		ParamBilatBounds<double>(0.0, KCP_MAX),		    PARAM_IN_OUT,       DEFAULT_KCP.data(),				"Vector of nDOF floats ( see Eq. (2) )"),
         new ParamProxyBasic<double>("kcn",     	            PARAM_ID_KCN,                   N_DOF,		ParamBilatBounds<double>(0.0, KCN_MAX),		    PARAM_IN_OUT,       DEFAULT_KCN.data(),				"Vector of nDOF floats ( see Eq. (2) )"),
-        new ParamProxyBasic<double>("ki",          	        PARAM_ID_KI,                    N_DOF,		ParamBilatBounds<double>(0.0, KI_MAX),		    PARAM_IN_OUT,       DEFAULT_KI.data(),				"Vector of nDOF floats representing the position gains ( see Eq. (x) )"),
-        new ParamProxyBasic<double>("kp",          	        PARAM_ID_KP,                    N_DOF,		ParamBilatBounds<double>(0.0, KP_MAX),		    PARAM_IN_OUT,       DEFAULT_KP.data(),				"Vector of nDOF floats representing the integral gains ( see Eq. (x) )"),
+        new ParamProxyBasic<double>("kp",          	        PARAM_ID_KP,                    N_DOF,		ParamBilatBounds<double>(0.0, KP_MAX),		    PARAM_IN_OUT,       DEFAULT_KP.data(),				"Vector of nDOF floats representing the position gains ( see Eq. (x) )"),
+        new ParamProxyBasic<double>("ki",                   PARAM_ID_KI,                    N_DOF,      ParamBilatBounds<double>(0.0, KI_MAX),          PARAM_IN_OUT,       DEFAULT_KI.data(),              "Vector of nDOF floats representing the integral gains ( see Eq. (x) )"),
+        new ParamProxyBasic<double>("kd",                   PARAM_ID_KD,                    N_DOF,      ParamBilatBounds<double>(0.0, KI_MAX),          PARAM_IN_OUT,       DEFAULT_KD.data(),              "Vector of nDOF floats representing the derivative gains ( see Eq. (x) )"),
         new ParamProxyBasic<double>("coulomb vel thr",      PARAM_ID_COULOMB_VEL_THR,       N_DOF,		ParamBilatBounds<double>(0.0, 10.0),		    PARAM_IN_OUT,       DEFAULT_COULOMB_VEL_THR.data(),	"Vector of nDOF floats representing the joint vel (deg/s) at which Coulomb friction is completely compensated"),
         new ParamProxyBasic<double>("Vmax",          	    PARAM_ID_VMAX,                  N_DOF,		ParamBilatBounds<double>(0.0, V_MAX),		    PARAM_IN_OUT,       DEFAULT_VMAX.data(),			"Vector of nDOF positive floats representing the tensions' bounds (|Vm| < Vmax"),
         new ParamProxyBasic<int>(   "sendCommands",   	 	PARAM_ID_SENDCMD,               1,			ParamBilatBounds<int>(0, 1),				    PARAM_IN_OUT,       &DEFAULT_SENDCMD,				"If equal to 1, send commands for torque control"),
         new ParamProxyBasic<string>("monitored joint",     	PARAM_ID_MONITORED_JOINT,       1,							                                PARAM_IN_OUT,       0,		                        "Name of the joint to monitor"),
-        new ParamProxyBasic<double>("ks",          	        PARAM_ID_KS,                    N_DOF,		ParamBilatBounds<double>(0.0, 100.0),		    PARAM_IN_OUT,       DEFAULT_ZEROS_NDOF.data(),		"Joint stiffnesses"),
-        new ParamProxyBasic<double>("kd",          	        PARAM_ID_KD,                    N_DOF,		ParamBilatBounds<double>(0.0, 100.0),		    PARAM_IN_OUT,       DEFAULT_ZEROS_NDOF.data(),		"Joint dampings"),
+        new ParamProxyBasic<double>("kStiff",          	    PARAM_ID_KSTIFF,                    N_DOF,		ParamBilatBounds<double>(0.0, 100.0),		    PARAM_IN_OUT,   DEFAULT_ZEROS_NDOF.data(),		"Joint stiffnesses"),
+        new ParamProxyBasic<double>("kDamp",          	    PARAM_ID_KDAMP,                    N_DOF,		ParamBilatBounds<double>(0.0, 100.0),		    PARAM_IN_OUT,   DEFAULT_ZEROS_NDOF.data(),		"Joint dampings"),
         new ParamProxyBasic<int>(   "grav comp on",         PARAM_ID_GRAV_COMP_ON,          1,		    ParamBilatBounds<int>(0, 1),		            PARAM_IN_OUT,       &DEFAULT_GRAV_COMP_ON,		    "1 if gravity compensation is on, 0 otherwise"),
         new ParamProxyBasic<double>("qDes",          	    PARAM_ID_Q_DES,                 N_DOF,		ParamBilatBounds<double>(-180.0, 180.0),		PARAM_IN_OUT,       DEFAULT_ZEROS_NDOF.data(),		"Desired joint angles"),
         new ParamProxyBasic<double>("fcomp",          	    PARAM_ID_FRICTION_COMPENSATION, N_DOF,		ParamBilatBounds<double>(0, 1.0),               PARAM_IN_OUT,       DEFAULT_FRICTION_COMPENSATION.data(), "Viscous friction compensation factor (from 0.0 to 1.0)"),
