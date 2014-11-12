@@ -35,14 +35,14 @@ typedef Eigen::Matrix<double,ICUB_DOFS,1>          VectorNd;
 
 namespace motorFrictionExcitation
 {
-    
+
     ///< specify whether or not the commands are sent to the motors
     enum MFE_MotorCommandMode
     {
         DO_NOT_SEND_COMMANDS_TO_MOTORS = 0,
         SEND_COMMANDS_TO_MOTORS = 1
     };
-    
+
     // *** DEFAULT PARAMETER VALUES
     static const string                 DEFAULT_MODULE_NAME     = "motorFrictionExcitation";        ///< name of the module
     static const int                    DEFAULT_CTRL_PERIOD     = 10;                               ///< controller period in ms
@@ -53,13 +53,13 @@ namespace motorFrictionExcitation
     static const int                    DEFAULT_SEND_COMMANDS   = SEND_COMMANDS_TO_MOTORS;
     static const double                 DEFAULT_JNT_LIM_MIN_DIST = 10.0;
     static const double                 DEFAULT_POS_INT_GAIN    = 1e-5;
-    
+
     // *** IDs of all the module command
     enum MotorFrictionExcitationCommandId {
         COMMAND_ID_START,   COMMAND_ID_STOP,    COMMAND_ID_RESET,   COMMAND_ID_HELP,    COMMAND_ID_QUIT,
         COMMAND_ID_SIZE
     };
-    
+
     // ******************************************************************************************************************************
     // ****************************************** DESCRIPTION OF ALL THE MODULE COMMANDS ********************************************
     // ******************************************************************************************************************************
@@ -72,7 +72,7 @@ namespace motorFrictionExcitation
         CommandDescription("help",          COMMAND_ID_HELP,            "Get instructions about how to communicate with this module"),
         CommandDescription("quit",          COMMAND_ID_QUIT,            "Stop the controller and quit the module"),
     };
-    
+
     ///< IDs of all the module parameters
     enum MotorFrictionExcitationParamId
     {
@@ -84,7 +84,7 @@ namespace motorFrictionExcitation
         PARAM_ID_KT_STD_DEV_THR,    PARAM_ID_FRIC_STD_DEV_THR,
         PARAM_ID_SIZE /*This is the number of parameters, so it must be the last value of the enum.*/
     };
-    
+
     ///< Ids of the subparameters conposing the struct parameter FreeMotionExcitation
     enum FreeMotionExcitationParamId
     {
@@ -93,35 +93,35 @@ namespace motorFrictionExcitation
         PARAM_ID_FRIC_PAR_COV_THR,  PARAM_ID_POS_INT_GAIN,
         FREE_MOTION_EXCITATION_PARAM_ID_SIZE /*This is the number of parameters, so it must be the last value of the enum.*/
     };
-    
+
     // ******************************************************************************************************************************
     // ****************************************** DESCRIPTION OF ALL THE MODULE PARAMETERS ******************************************
     // ******************************************************************************************************************************
-    
+
     class ContactExcitation
     {
     public:
-        ArrayXi jointId;
+        std::vector<std::string> jointID;
         ArrayXd initialJointConfiguration;
         ArrayXd paramCovarThresh;
-        
+
         //ContactExcitation();
         bool set(const yarp::os::Bottle &value, yarp::os::Bottle &reply);
         bool setSubparam(const std::string &name, const yarp::os::Bottle &value, yarp::os::Bottle &reply);
         std::string toString() const;
     };
-    
+
     class ContactExcitationList : public std::vector<ContactExcitation>
     {
     public:
         bool readFromConfigFile(yarp::os::ResourceFinder &rf, yarp::os::Bottle &reply);
         std::string toString() const;
     };
-    
+
     class FreeMotionExcitation
     {
     public:
-        ArrayXi jointId;
+        std::vector<std::string> jointID;
         ArrayXd initialJointConfiguration;
         ArrayXd a;
         ArrayXd a0;
@@ -129,20 +129,20 @@ namespace motorFrictionExcitation
         ArrayXd jointLimitThresh;
         ArrayXd fricParamCovarThresh;
         ArrayXd ki;
-        
+
         //ContactExcitation();
         bool set(const yarp::os::Bottle &value, yarp::os::Bottle &reply);
         bool setSubparam(const std::string &name, const yarp::os::Bottle &value, yarp::os::Bottle &reply);
         std::string toString() const;
     };
-    
+
     class FreeMotionExcitationList : public std::vector<FreeMotionExcitation>
     {
     public:
         bool readFromConfigFile(yarp::os::ResourceFinder &rf, yarp::os::Bottle &reply);
         std::string toString() const;
     };
-    
+
     const ParamProxyInterface *const motorFrictionExcitationParamDescr[PARAM_ID_SIZE]  =
     {
         // ************************************************* STRUCT PARAMETERS ****************************************************************************************************************************************************************************************************************************************
@@ -164,7 +164,7 @@ namespace motorFrictionExcitation
         new ParamProxyBasic<double>("kt std dev thr",       PARAM_ID_KT_STD_DEV_THR,    1,                  ParamBilatBounds<double>(0.0, 1.0),         PARAM_MONITOR,      0,                              "Threshold of the standard deviation of the parameter kt of the currently excited motor"),
         new ParamProxyBasic<double>("fric std dev thr",     PARAM_ID_FRIC_STD_DEV_THR,  1,                  ParamBilatBounds<double>(0.0, 1.0),         PARAM_MONITOR,      0,                              "Threshold of the standard deviation of the friction parameters of the currently excited motor")
     };
-    
-}   // end namespace 
+
+}   // end namespace
 
 #endif
