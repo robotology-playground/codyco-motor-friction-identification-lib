@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2013 CoDyCo
  * Author: Andrea Del Prete
  * email:  andrea.delprete@iit.it
@@ -55,20 +55,20 @@ bool FreeMotionExcitation::setSubparam(const std::string &name, const yarp::os::
     if(value.get(0).isList())   ///< if the value is a list then unpack it
         value = *v.get(0).asList();
     bool res = false;
-    
+
     if(name=="joint_id")
     {
         res = true;
-        jointId.resize(value.size());
+        jointID.resize(value.size());
         for(int j=0; j<value.size(); j++)
         {
-            if(!value.get(j).isInt())
+            if(!value.get(j).isString())
             {
                 res = false;
                 reply.addString(strapp("The value ",j," of the parameter ",name," is not of the expected type").c_str());
                 continue;
             }
-            jointId[j] = value.get(j).asInt();
+            jointID[j] = value.get(j).asString();
         }
     }
     else if(name=="initial_joint_configuration")
@@ -176,12 +176,24 @@ bool FreeMotionExcitation::setSubparam(const std::string &name, const yarp::os::
             ki[j] = value.get(j).asDouble();
         }
     }
-    
+
     return res;
 }
+
+std::string vecToString(const std::vector<std::string> & vec)
+{
+    stringstream ss;
+    for(int i=0; i < vec.size(); i++)
+    {
+       ss << vec[i] << " ";
+    }
+    return ss.str();
+}
+
 std::string FreeMotionExcitation::toString() const
 {
-    return strapp("Joint id (",jointId.transpose(),"); Initial joint configuration (",
+
+    return strapp("Joint id (",vecToString(jointID),"); Initial joint configuration (",
                   initialJointConfiguration.transpose(), "); Param covariance threshold (", fricParamCovarThresh.transpose()) + strapp("); a(", a.transpose(), "); a0(", a0.transpose()) + strapp("); w(", w.transpose(), "); ki:(", ki.transpose(), ")");
 }
 
@@ -238,7 +250,7 @@ string FreeMotionExcitationList::toString() const
 // ************************************************************************************************
 string ContactExcitation::toString() const
 {
-    return strapp("Joint id (",jointId.transpose(),"); Initial joint configuration (", 
+    return strapp("Joint id (",vecToString(jointID),"); Initial joint configuration (",
         initialJointConfiguration.transpose(), "); Param covariance threshold (", paramCovarThresh.transpose(),")");
 }
 
@@ -276,16 +288,16 @@ bool ContactExcitation::setSubparam(const string &name, const Bottle &v, Bottle 
     if(name=="joint_id")
     {
         res = true;
-        jointId.resize(value.size());
+        jointID.resize(value.size());
         for(int j=0; j<value.size(); j++)
         {
-            if(!value.get(j).isInt())
+            if(!value.get(j).isString())
             {
                 res = false;
                 reply.addString(strapp("The value ",j," of the parameter ",name," is not of the expected type").c_str());
                 continue;
             }
-            jointId[j] = value.get(j).asInt();
+            jointID[j] = value.get(j).asString();
         }
     }
     else if(name=="initial_joint_configuration")

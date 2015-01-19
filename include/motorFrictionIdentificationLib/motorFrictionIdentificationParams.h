@@ -63,7 +63,7 @@ enum MotorFrictionIdentificationParamId
 { 
     /* Configuration parameters */
     PARAM_ID_MODULE_NAME,           PARAM_ID_CTRL_PERIOD,               PARAM_ID_ROBOT_NAME, 
-    PARAM_ID_JOINT_LIST,        
+    PARAM_ID_JOINT_NAMES_LIST,        
     /* Input parameters */
     PARAM_ID_ACTIVE_JOINTS,         PARAM_ID_IDENTIF_DELAY,     
     PARAM_ID_ZERO_JOINT_VEL_THRESH, PARAM_ID_ZERO_TORQUE_VEL_THRESH,    PARAM_ID_EXT_TORQUE_THRESH,
@@ -96,7 +96,7 @@ const ParamProxyInterface *const motorFrictionIdentificationParamDescr[PARAM_ID_
 new ParamProxyBasic<string>("name",                 PARAM_ID_MODULE_NAME,           1,                                                          PARAM_CONFIG,       &DEFAULT_MODULE_NAME,               "Name of the instance of the module"), 
 new ParamProxyBasic<int>(   "period",               PARAM_ID_CTRL_PERIOD,           1,                  ParamBilatBounds<int>(1,1000),          PARAM_CONFIG,       &DEFAULT_CTRL_PERIOD,               "Period of the control loop (ms)"), 
 new ParamProxyBasic<string>("robot",                PARAM_ID_ROBOT_NAME,            1,                                                          PARAM_CONFIG,       &DEFAULT_ROBOT_NAME,                "Name of the robot"), 
-new ParamProxyBasic<int>(   "joint list",           PARAM_ID_JOINT_LIST,            PARAM_SIZE_FREE,    ParamBilatBounds<int>(0,100),           PARAM_CONFIG,       0,                                  "List of the ids of the robot joints to use"), 
+new ParamProxyBasic<int>(   "joint list",           PARAM_ID_JOINT_NAMES_LIST,            PARAM_SIZE_FREE,    ParamBilatBounds<int>(0,100),           PARAM_CONFIG,       0,                                  "List of the ids of the robot joints to use"), 
 // ************************************************* RPC OUTPUT PARAMETERS ************************************************************************************************************************************************************************************************************************************
 new ParamProxyBasic<string>("joint names",          PARAM_ID_JOINT_NAMES,           PARAM_SIZE_FREE,                                            PARAM_OUTPUT,       0,                                  "List of the names of the (used) robot joints"), 
 // ************************************************* RPC INPUT OUTPUT PARAMETERS ******************************************************************************************************************************************************************************************************************************
